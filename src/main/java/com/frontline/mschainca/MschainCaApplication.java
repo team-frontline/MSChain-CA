@@ -1,19 +1,19 @@
 package com.frontline.mschainca;
 
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
+import com.frontline.mschainca.service.CaService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.IOException;
-import java.io.StringReader;
-
 @SpringBootApplication
 public class MschainCaApplication {
+    @Autowired
+    //CaService caService;
 
     public static void main(String[] args) {
         SpringApplication.run(MschainCaApplication.class, args);
+
+
 
         /*
         Common Name (CN): www.google.com
@@ -35,26 +35,8 @@ public class MschainCaApplication {
                 "Q0uA0aVog3f5iJxCa3Hp5gxbJQ6zV6kJ0TEsuaaOhEko9sdpCoPOnRBm2i/XRD2D\n" +
                 "6iNh8f8z0ShGsFqjDgFHyF3o+lUyj+UC6H1QW7bn\n" +
                 "-----END CERTIFICATE REQUEST-----";
-        PemObject pemObject;
-
-        final PemReader pemReader = new PemReader(new StringReader(csr));
-        try {
-            pemObject = pemReader.readPemObject();
-            PKCS10CertificationRequest decodedCsr = new PKCS10CertificationRequest(pemObject.getContent());
-
-            /*
-            Common Name: www.google.com
-			Organization: Google Inc
-			Organization Unit: Information Technology
-			Locality: Mountain View
-			State: California
-			Country: US
-            * */
-
-            System.out.println(decodedCsr.getSubject().toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        CaService caService = new CaService();
+        caService.decodeCSR(csr);
     }
 
 }
