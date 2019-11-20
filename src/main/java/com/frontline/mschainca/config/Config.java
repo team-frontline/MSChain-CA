@@ -13,4 +13,6 @@ public class Config {
     public static final String PRIVATE_KEY_FILE_NAME = "private_key.pem";
 
     public static final String PUBLIC_KEY_FILE_NAME = "public_key.pem";
+
+    public static final String CA_NAME = "CA1";
 }
