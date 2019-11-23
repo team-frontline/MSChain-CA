@@ -27,6 +27,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Date;
 
 public class Util {
@@ -87,6 +88,32 @@ public class Util {
 
         return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
                 .getCertificate(certificateHolder);
+    }
+
+    public static String signCSR(PKCS10CertificationRequest csr) throws NoSuchAlgorithmException, IOException,
+            InvalidKeySpecException, OperatorCreationException {
+        KeyPair keyPair = getKeyPairFromFiles(Config.KEY_STORE_PATH
+                        + File.separator + Config.PRIVATE_KEY_FILE_NAME,
+                Config.KEY_STORE_PATH + File.separator + Config.PUBLIC_KEY_FILE_NAME);
+        SubjectPublicKeyInfo caPublicKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
+        X509v3CertificateBuilder clientCertBuilder = new X509v3CertificateBuilder(
+                new X500Name("CN=" + Config.CA_NAME),
+                BigInteger.valueOf(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L),
+                new Date(System.currentTimeMillis() + 2 * 365 * 24 * 60 * 60 * 1000L),
+                csr.getSubject(),
+                csr.getSubjectPublicKeyInfo()
+        );
+        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA512WithRSAEncryption");
+        ContentSigner signer = csBuilder.build(keyPair.getPrivate());
+        X509CertificateHolder certificateHolder = clientCertBuilder.build(signer);
+
+        StringWriter stringWriter =  new StringWriter();
+        PemWriter pemWriter = new PemWriter(stringWriter);
+        pemWriter.writeObject(new PemObject("CERTIFICATE", certificateHolder.toASN1Structure().getEncoded()));
+        pemWriter.close();
+
+        return stringWriter.toString();
     }
 
     public static PrivateKey getPrivateKeyFromFile(String filename)
