@@ -27,7 +27,6 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Date;
 
 public class Util {
@@ -108,12 +107,34 @@ public class Util {
         ContentSigner signer = csBuilder.build(keyPair.getPrivate());
         X509CertificateHolder certificateHolder = clientCertBuilder.build(signer);
 
-        StringWriter stringWriter =  new StringWriter();
+        StringWriter stringWriter = new StringWriter();
         PemWriter pemWriter = new PemWriter(stringWriter);
         pemWriter.writeObject(new PemObject("CERTIFICATE", certificateHolder.toASN1Structure().getEncoded()));
         pemWriter.close();
 
         return stringWriter.toString();
+    }
+
+    public static byte[] signString(String message) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException,
+            InvalidKeyException, SignatureException {
+        Security.addProvider(new BouncyCastleProvider());
+        PrivateKey privateKey = getPrivateKeyFromFile(Config.KEY_STORE_PATH + File.separator
+                + Config.PRIVATE_KEY_FILE_NAME);
+        Signature signature = Signature.getInstance("SHA1withRSA");
+        signature.initSign(privateKey);
+        signature.update(message.getBytes());
+        return signature.sign();
+    }
+
+    public static boolean verifySignedString(String message, byte[] signedMessage) throws NoSuchAlgorithmException,
+            IOException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+        Security.addProvider(new BouncyCastleProvider());
+        PublicKey publicKey = getPublicKeyFromFile(Config.KEY_STORE_PATH + File.separator
+                + Config.PUBLIC_KEY_FILE_NAME);
+        Signature signature = Signature.getInstance("SHA1withRSA");
+        signature.initVerify(publicKey);
+        signature.update(message.getBytes());
+        return signature.verify(signedMessage);
     }
 
     public static PrivateKey getPrivateKeyFromFile(String filename)

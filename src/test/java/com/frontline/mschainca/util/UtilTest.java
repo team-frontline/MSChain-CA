@@ -12,9 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
@@ -104,7 +102,7 @@ class UtilTest {
         PKCS10CertificationRequest certificationRequest = Util.getCSRfromString(csr);
         String certString = null;
         try {
-            certString =  Util.signCSR(certificationRequest);
+            certString = Util.signCSR(certificationRequest);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -115,5 +113,29 @@ class UtilTest {
             e.printStackTrace();
         }
         Assert.assertNotNull(certString);
+    }
+
+    @Test
+    void signString() throws InvalidKeySpecException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, IOException {
+        String message = "hello is it me you looking for";
+        byte [] signedMsg = null;
+        boolean verified = false;
+        try {
+            signedMsg = Util.signString(message);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+        if (signedMsg != null) {
+            verified = Util.verifySignedString(message, signedMsg);
+        }
+        Assert.assertTrue(verified);
     }
 }
