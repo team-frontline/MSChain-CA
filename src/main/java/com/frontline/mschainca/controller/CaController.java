@@ -8,11 +8,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(value = "ca/")
 public class CaController {
 
-    public String requestNewCertificate(@RequestBody String csr){
+    /*
+    let issueBody = {
+        "cert": "",
+        "intermediateCert": "",
+        "sig": ""
+    };
+    let revokeBody = {
+        "cert": "",
+        "caCert": "",
+        "caSig": ""
+    };
+    * */
+
+    public String requestNewCertificate(@RequestBody String csr) {
         return null;
     }
 
-    public void revokeCertificate(){}
+    public void revokeCertificate() {
+    }
 
 
 }

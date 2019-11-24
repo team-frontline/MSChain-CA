@@ -10,9 +10,8 @@ public class Config {
             $ openssl rsa -in private_key.pem -pubout -out public_key.pem
     * */
 
-    public static final String PRIVATE_KEY_FILE_NAME = "private_key.pem";
+    public static final String PRIVATE_KEY_FILE_NAME = "CA1.key";
 
     public static final String PUBLIC_KEY_FILE_NAME = "public_key.pem";
 
-    public static final String CA_NAME = "CA1";
 }
