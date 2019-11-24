@@ -31,6 +31,10 @@ import java.util.Date;
 
 public class Util {
 
+    private static PrivateKey caPrivateKey;
+    private static PublicKey caPublicKey;
+    private static X509Certificate caCertificate;
+
     public static void decodeCSR(String csr) {
         PemObject pemObject;
         final PemReader pemReader = new PemReader(new StringReader(csr));
@@ -65,28 +69,32 @@ public class Util {
 
     public static X509Certificate generateSelfSingedCert() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException,
             OperatorCreationException, CertificateException {
-        KeyPair keyPair = getKeyPairFromFiles(Config.KEY_STORE_PATH
-                        + File.separator + Config.PRIVATE_KEY_FILE_NAME,
-                Config.KEY_STORE_PATH + File.separator + Config.PUBLIC_KEY_FILE_NAME);
-        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
-        X509v3CertificateBuilder certificateBuilder = new X509v3CertificateBuilder(
-                new X500Name("CN=" + Config.CA_NAME),
-                BigInteger.valueOf(System.currentTimeMillis()),
-                new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L),
-                new Date(System.currentTimeMillis() + 2 * 365 * 24 * 60 * 60 * 1000L),
-                new X500Name("CN=" + Config.CA_NAME),
-                publicKeyInfo
-        );
-        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA512WithRSAEncryption");
-        ContentSigner signer = csBuilder.build(keyPair.getPrivate());
-        X509CertificateHolder certificateHolder = certificateBuilder.build(signer);
+        if(caCertificate == null) {
+            KeyPair keyPair = getKeyPairFromFiles(Config.KEY_STORE_PATH
+                            + File.separator + Config.PRIVATE_KEY_FILE_NAME,
+                    Config.KEY_STORE_PATH + File.separator + Config.PUBLIC_KEY_FILE_NAME);
+            SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
+            X509v3CertificateBuilder certificateBuilder = new X509v3CertificateBuilder(
+                    new X500Name("CN=" + Config.CA_NAME),
+                    BigInteger.valueOf(System.currentTimeMillis()),
+                    new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L),
+                    new Date(System.currentTimeMillis() + 2 * 365 * 24 * 60 * 60 * 1000L),
+                    new X500Name("CN=" + Config.CA_NAME),
+                    publicKeyInfo
+            );
+            JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA512WithRSAEncryption");
+            ContentSigner signer = csBuilder.build(keyPair.getPrivate());
+            X509CertificateHolder certificateHolder = certificateBuilder.build(signer);
 
-        PemWriter pemWriter = new PemWriter(new FileWriter(Config.KEY_STORE_PATH + File.separator + "certCA1.pem"));
-        pemWriter.writeObject(new PemObject("CERTIFICATE", certificateHolder.toASN1Structure().getEncoded()));
-        pemWriter.close();
+            PemWriter pemWriter = new PemWriter(new FileWriter(Config.KEY_STORE_PATH + File.separator
+                    + "certCA1.pem"));
+            pemWriter.writeObject(new PemObject("CERTIFICATE", certificateHolder.toASN1Structure().getEncoded()));
+            pemWriter.close();
 
-        return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
-                .getCertificate(certificateHolder);
+            caCertificate = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
+                    .getCertificate(certificateHolder);
+        }
+        return caCertificate;
     }
 
     public static String signCSR(PKCS10CertificationRequest csr) throws NoSuchAlgorithmException, IOException,
@@ -139,24 +147,30 @@ public class Util {
 
     public static PrivateKey getPrivateKeyFromFile(String filename)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        PemReader pemReader = new PemReader(new FileReader(filename));
-        PemObject pemObject = pemReader.readPemObject();
-        byte[] keyBytes = pemObject.getContent();
-        pemReader.close();
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePrivate(spec);
+        if (caPrivateKey == null) {
+            PemReader pemReader = new PemReader(new FileReader(filename));
+            PemObject pemObject = pemReader.readPemObject();
+            byte[] keyBytes = pemObject.getContent();
+            pemReader.close();
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            caPrivateKey = kf.generatePrivate(spec);
+        }
+        return caPrivateKey;
     }
 
     public static PublicKey getPublicKeyFromFile(String filename)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        PemReader pemReader = new PemReader(new FileReader(filename));
-        PemObject pemObject = pemReader.readPemObject();
-        byte[] keyBytes = pemObject.getContent();
-        pemReader.close();
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+        if (caPublicKey == null) {
+            PemReader pemReader = new PemReader(new FileReader(filename));
+            PemObject pemObject = pemReader.readPemObject();
+            byte[] keyBytes = pemObject.getContent();
+            pemReader.close();
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            caPublicKey = kf.generatePublic(spec);
+        }
+        return caPublicKey;
     }
 
     public static KeyPair getKeyPairFromFiles(String privateKeyFilePath, String publicKeyFilePath)
