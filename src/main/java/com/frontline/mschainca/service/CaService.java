@@ -39,8 +39,10 @@ public class CaService {
         return Util.signString(certificate);
     }
 
-    public void revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
+    public String revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
             OperatorCreationException, NoSuchAlgorithmException, IOException, SignatureException, InvalidKeyException {
+        StringBuilder responseStringBuilder = new StringBuilder();
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cert", cert);
         params.add("caCert", Util.stringFromCert(Util.generateSelfSingedCert()));
@@ -52,11 +54,14 @@ public class CaService {
                 .body(BodyInserters.fromFormData(params))
                 .retrieve()
                 .bodyToFlux(String.class);
-        stringFlux.subscribe(s -> System.out.println(s));
+
+        stringFlux.subscribe(responseStringBuilder::append);
+        return responseStringBuilder.toString();
     }
 
-    public void issueCertificate(String cert) throws InvalidKeySpecException, CertificateException,
+    public String issueCertificate(String cert) throws InvalidKeySpecException, CertificateException,
             OperatorCreationException, NoSuchAlgorithmException, IOException {
+        StringBuilder responseStriongBuilder = new StringBuilder();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cert", cert);
@@ -70,12 +75,14 @@ public class CaService {
                 .retrieve()
                 .bodyToFlux(String.class);
 
-        stringFlux.subscribe(s -> System.out.println(s));
+        stringFlux.subscribe(responseStriongBuilder::append);
+        return responseStriongBuilder.toString();
     }
-//
-//    public String getSignedProposedCertificate(String proposedCert, String msUrl) {
-//
-//    }
+
+    public String getSignedProposedCertificate(String proposedCert, String msUrl) {
+        return null;
+
+    }
 
 
 }

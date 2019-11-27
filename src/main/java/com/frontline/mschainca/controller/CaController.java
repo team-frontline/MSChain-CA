@@ -1,14 +1,14 @@
 package com.frontline.mschainca.controller;
 
+import com.frontline.mschainca.service.CaService;
 import com.frontline.mschainca.util.Util;
-import org.bouncycastle.operator.OperatorCreationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "ca/")
@@ -27,18 +27,31 @@ public class CaController {
     };
     * */
 
+    @Autowired
+    CaService caService;
+
+
+    @ResponseBody
+    @RequestMapping(value = "/certificate/new")
     public String requestNewCertificate(@RequestBody String csr) {
         try {
             String proposedCert = Util.signCSR(Util.getCSRfromString(csr));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | OperatorCreationException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
-    public void revokeCertificate() {
+    @ResponseBody
+    @RequestMapping(value = "/certificate/revoke")
+    public ResponseEntity<String> revokeCertificate(@RequestBody String certificateToRevoke) {
+        String responseRevokeCert = null;
+        try {
+            responseRevokeCert = caService.revokeCertificate(certificateToRevoke);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseRevokeCert != null ? new ResponseEntity<>(responseRevokeCert, HttpStatus.OK)
+                : new ResponseEntity<>("Revocation Failed", HttpStatus.OK);
     }
-
-
 }
