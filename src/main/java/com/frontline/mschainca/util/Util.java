@@ -184,7 +184,7 @@ public class Util {
         Security.addProvider(new BouncyCastleProvider());
         PrivateKey privateKey = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
                 + Config.PRIVATE_KEY_FILE_NAME).getPrivate();
-        Signature signature = Signature.getInstance("SHA1withRSA");
+        Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(privateKey);
         signature.update(message.getBytes());
         return signature.sign();
@@ -193,9 +193,9 @@ public class Util {
     public static boolean verifySignedString(String message, byte[] signedMessage) throws NoSuchAlgorithmException,
             IOException, InvalidKeySpecException, InvalidKeyException, SignatureException {
         Security.addProvider(new BouncyCastleProvider());
-        PublicKey publicKey = getPublicKeyFromFile(Config.KEY_STORE_PATH + File.separator
-                + Config.PUBLIC_KEY_FILE_NAME);
-        Signature signature = Signature.getInstance("SHA1withRSA");
+        PublicKey publicKey = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
+                + Config.PRIVATE_KEY_FILE_NAME).getPublic();
+        Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initVerify(publicKey);
         signature.update(message.getBytes());
         return signature.verify(signedMessage);
