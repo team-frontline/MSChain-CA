@@ -1,7 +1,6 @@
 package com.frontline.mschainca.controller;
 
 import com.frontline.mschainca.service.CaService;
-import com.frontline.mschainca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value = "ca/")
@@ -33,13 +34,19 @@ public class CaController {
 
     @ResponseBody
     @RequestMapping(value = "/certificate/new")
-    public String requestNewCertificate(@RequestBody String csr) {
+    public String requestNewCertificate(@RequestBody String csr, HttpServletRequest request) {
         try {
-            String proposedCert = Util.signCSR(Util.getCSRfromString(csr));
+            //String proposedCert = Util.signCSR(Util.getCSRfromString(csr));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        System.out.println(request.getRemoteAddr());
+        System.out.println(request.getMethod());
+        System.out.println(request.getRemotePort());
+        System.out.println(request.getLocalPort());
+        System.out.println(request.getServerPort());
+
+        return "All is well";
     }
 
     @ResponseBody
