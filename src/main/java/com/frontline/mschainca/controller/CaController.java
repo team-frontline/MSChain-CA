@@ -1,5 +1,6 @@
 package com.frontline.mschainca.controller;
 
+import com.frontline.mschainca.dto.CertificateDto;
 import com.frontline.mschainca.dto.CsrDto;
 import com.frontline.mschainca.service.CaService;
 import com.frontline.mschainca.util.Util;
@@ -50,12 +51,16 @@ public class CaController {
 
     @ResponseBody
     @RequestMapping(value = "/certificate/revoke")
-    public ResponseEntity<String> revokeCertificate(@RequestBody String certificateToRevoke) {
+    public ResponseEntity<String> revokeCertificate(@RequestBody CertificateDto certificateToRevoke) {
         String responseRevokeCert = null;
         try {
-            responseRevokeCert = caService.revokeCertificate(certificateToRevoke);
+            responseRevokeCert = caService.revokeCertificate(certificateToRevoke.getCertificate());
         } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                e.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         return responseRevokeCert != null ? new ResponseEntity<>(responseRevokeCert, HttpStatus.OK)
                 : new ResponseEntity<>("Revocation Failed", HttpStatus.OK);
