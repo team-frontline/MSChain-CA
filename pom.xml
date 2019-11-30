@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.frontline</groupId>
 	<artifactId>mschain-ca</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>mschain-ca</name>
 	<description>CA for MsChain</description>
 
