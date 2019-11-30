@@ -1,6 +1,8 @@
 package com.frontline.mschainca.controller;
 
+import com.frontline.mschainca.dto.CsrDto;
 import com.frontline.mschainca.service.CaService;
+import com.frontline.mschainca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,19 +37,15 @@ public class CaController {
 
     @ResponseBody
     @RequestMapping(value = "/certificate/new")
-    public String requestNewCertificate(@RequestBody String csr, HttpServletRequest request) {
+    public String requestNewCertificate(@RequestBody CsrDto csrDto) {
+        String response = null;
         try {
-            //String proposedCert = Util.signCSR(Util.getCSRfromString(csr));
+            String proposedCert = Util.signCSR(Util.getCSRfromString(csrDto.getCsr()));
+            response = caService.issueCertificate(proposedCert);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(request.getRemoteAddr());
-        System.out.println(request.getMethod());
-        System.out.println(request.getRemotePort());
-        System.out.println(request.getLocalPort());
-        System.out.println(request.getServerPort());
-
-        return "All is well";
+        return response;
     }
 
     @ResponseBody

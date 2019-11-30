@@ -1,8 +1,12 @@
 package com.frontline.mschainca.config;
 
+import java.io.File;
+
 public class Config {
 
-    public static final String KEY_STORE_PATH = "E:\\FYP\\Implementations\\mschain-ca\\resources\\keystore";
+    private static final String BASE_PATH = new File("").getAbsolutePath();
+
+    public static final String KEY_STORE_PATH = BASE_PATH + File.separator + "resources" + File.separator + "keystore";
 
     /*  To genetare private key
             $ openssl genpkey -out rsakey.pem -algorithm RSA -pkeyopt rsa_keygen_bits:2048

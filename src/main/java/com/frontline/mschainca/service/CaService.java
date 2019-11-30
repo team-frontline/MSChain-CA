@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -68,15 +70,25 @@ public class CaService {
         params.add("intermediateCert", Util.stringFromCert(Util.generateSelfSingedCert()));
         params.add("sig", "");
 
-        Flux<String> stringFlux = WebClient.create()
+//        Flux<String> stringFlux = WebClient.create()
+////                .post()
+////                .uri("http://18.232.207.225:3000/api/issue")
+////                .body(BodyInserters.fromFormData(params))
+////                .retrieve()
+////                .bodyToFlux(String.class);
+
+
+        Mono<ClientResponse> responseMono = WebClient.create()
                 .post()
                 .uri("http://18.232.207.225:3000/api/issue")
                 .body(BodyInserters.fromFormData(params))
-                .retrieve()
-                .bodyToFlux(String.class);
+                .exchange();
 
-        stringFlux.subscribe(responseStriongBuilder::append);
-        return responseStriongBuilder.toString();
+        return responseMono.flatMap(res -> res.bodyToMono(String.class)).block();
+//
+//        stringFlux.subscribe(s -> System.out.println(s));
+//        System.out.println("response"+ responseStriongBuilder.toString());
+//        return responseStriongBuilder.toString();
     }
 
     public String getSignedProposedCertificate(String proposedCert, String msUrl) {
