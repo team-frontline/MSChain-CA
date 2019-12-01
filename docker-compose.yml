@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  web:
+    container_name: mschain-ca1
+    image: mschain-ca:latest
+    working_dir: /
+    volumes:
+      - ./resources:/resources
+    ports:
+      - "8080:8080"
