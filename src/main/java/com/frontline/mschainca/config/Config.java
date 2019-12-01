@@ -6,7 +6,7 @@ public class Config {
 
     private static final String BASE_PATH = new File("").getAbsolutePath();
 
-    public static final String KEY_STORE_PATH = BASE_PATH + File.separator + "resources" + File.separator + "keystore";
+    public static final String KEY_STORE_PATH = BASE_PATH + File.separator+ "src"+ File.separator + "main" + File.separator + "resources" + File.separator + "keystore";
 
     /*  To genetare private key
             $ openssl genpkey -out rsakey.pem -algorithm RSA -pkeyopt rsa_keygen_bits:2048
