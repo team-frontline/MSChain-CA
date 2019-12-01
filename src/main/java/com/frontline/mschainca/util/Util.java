@@ -182,8 +182,9 @@ public class Util {
     public static byte[] signString(String message) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException,
             InvalidKeyException, SignatureException {
         Security.addProvider(new BouncyCastleProvider());
-        PrivateKey privateKey = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
-                + Config.PRIVATE_KEY_FILE_NAME).getPrivate();
+        KeyPair keyPair =  getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
+                + Config.PRIVATE_KEY_FILE_NAME);
+        PrivateKey privateKey = keyPair.getPrivate();
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(privateKey);
         signature.update(message.getBytes());

@@ -4,6 +4,7 @@ package com.frontline.mschainca.service;
 import com.frontline.mschainca.util.Util;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -45,10 +46,13 @@ public class CaService {
             OperatorCreationException, NoSuchAlgorithmException, IOException, SignatureException, InvalidKeyException {
         StringBuilder responseStringBuilder = new StringBuilder();
 
+        String caCert =  Util.stringFromCert(Util.generateSelfSingedCert());
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cert", cert);
-        params.add("caCert", Util.stringFromCert(Util.generateSelfSingedCert()));
-        params.add("caSig", new String(Util.signString(cert), StandardCharsets.ISO_8859_1));
+        params.add("caCert", caCert);
+//        params.add("caSig", new String(Util.signString(cert), StandardCharsets.ISO_8859_1));
+        params.add("caSig", new String(Hex.encode(Util.signString(cert))));
 
 //        Flux<String> stringFlux = WebClient.create()
 //                .post()
