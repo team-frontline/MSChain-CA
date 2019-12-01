@@ -41,7 +41,7 @@ public class CaService {
         return Util.signString(certificate);
     }
 
-    public String revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
+    public String  revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
             OperatorCreationException, NoSuchAlgorithmException, IOException, SignatureException, InvalidKeyException {
         StringBuilder responseStringBuilder = new StringBuilder();
 
@@ -50,15 +50,21 @@ public class CaService {
         params.add("caCert", Util.stringFromCert(Util.generateSelfSingedCert()));
         params.add("caSig", new String(Util.signString(cert), StandardCharsets.ISO_8859_1));
 
-        Flux<String> stringFlux = WebClient.create()
+//        Flux<String> stringFlux = WebClient.create()
+//                .post()
+//                .uri("http://18.232.207.225:3000/api/revoke")
+//                .body(BodyInserters.fromFormData(params))
+//                .retrieve()
+//                .bodyToFlux(String.class);
+
+        Mono<ClientResponse> responseMono = WebClient.create()
                 .post()
                 .uri("http://18.232.207.225:3000/api/revoke")
                 .body(BodyInserters.fromFormData(params))
-                .retrieve()
-                .bodyToFlux(String.class);
+                .exchange();
 
-        stringFlux.subscribe(responseStringBuilder::append);
-        return responseStringBuilder.toString();
+//        stringFlux.subscribe(s -> System.out.println(s));
+        return responseMono.flatMap(res -> res.bodyToMono(String.class)).block();
     }
 
     public String issueCertificate(String cert) throws InvalidKeySpecException, CertificateException,
