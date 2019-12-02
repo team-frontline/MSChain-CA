@@ -63,7 +63,7 @@ public class CaService {
 
         Mono<ClientResponse> responseMono = WebClient.create()
                 .post()
-                .uri("http://18.232.207.225:3000/api/revoke")
+                .uri("http://52.45.29.135:3000/api/revoke")
                 .body(BodyInserters.fromFormData(params))
                 .exchange();
 
@@ -90,7 +90,7 @@ public class CaService {
 
         Mono<ClientResponse> responseMono = WebClient.create()
                 .post()
-                .uri("http://18.232.207.225:3000/api/issue")
+                .uri("http://52.45.29.135:3000/api/issue")
                 .body(BodyInserters.fromFormData(params))
                 .exchange();
 
