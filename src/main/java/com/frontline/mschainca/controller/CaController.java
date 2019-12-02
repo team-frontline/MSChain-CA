@@ -11,9 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import reactor.core.publisher.Mono;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value = "ca/")
@@ -43,6 +40,7 @@ public class CaController {
         try {
             String proposedCert = Util.signCSR(Util.getCSRfromString(csrDto.getCsr()));
             response = caService.issueCertificate(proposedCert);
+            response = response.concat(", proposed Cert: " + proposedCert);
         } catch (Exception e) {
             e.printStackTrace();
         }
