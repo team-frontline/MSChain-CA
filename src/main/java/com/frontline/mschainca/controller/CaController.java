@@ -1,14 +1,18 @@
 package com.frontline.mschainca.controller;
 
+import com.frontline.mschainca.config.CaDetailsConfig;
 import com.frontline.mschainca.dto.CertificateDto;
 import com.frontline.mschainca.dto.CsrDto;
 import com.frontline.mschainca.dto.ResponseDto;
 import com.frontline.mschainca.service.CaService;
 import com.frontline.mschainca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,19 +49,23 @@ public class CaController {
             if (responseDto != null && responseDto.getResult().getStatus().equals("OK")) {
                 responseDto.setCertificate(proposedCert);
             }
-//            response = response.concat(", proposed Cert: " + proposedCert);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<ResponseDto>(responseDto, HttpStatus.OK);
+
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("name", CaDetailsConfig.COMMON_NAME);
+
+        return new ResponseEntity<ResponseDto>(responseDto,  headers, HttpStatus.OK);
     }
 
     @ResponseBody
     @RequestMapping(value = "/certificate/revoke")
-    public ResponseEntity<String> revokeCertificate(@RequestBody CertificateDto certificateToRevoke) {
-        String responseRevokeCert = null;
+    public ResponseEntity<ResponseDto> revokeCertificate(@RequestBody CertificateDto certificateToRevoke) {
+        ResponseDto responseDto = null;
         try {
-            responseRevokeCert = caService.revokeCertificate(certificateToRevoke.getCertificate());
+            responseDto = caService.revokeCertificate(certificateToRevoke.getCertificate());
+
         } catch (Exception e) {
             try {
                 e.printStackTrace();
@@ -65,7 +73,10 @@ public class CaController {
                 ex.printStackTrace();
             }
         }
-        return responseRevokeCert != null ? new ResponseEntity<>(responseRevokeCert, HttpStatus.OK)
-                : new ResponseEntity<>("Revocation Failed", HttpStatus.OK);
+
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("name", CaDetailsConfig.COMMON_NAME);
+
+        return new ResponseEntity<ResponseDto>(responseDto,  headers, HttpStatus.OK);
     }
 }

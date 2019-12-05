@@ -41,7 +41,7 @@ public class CaService {
         return Util.signString(certificate);
     }
 
-    public String revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
+    public ResponseDto revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
             OperatorCreationException, NoSuchAlgorithmException, IOException, SignatureException, InvalidKeyException {
         StringBuilder responseStringBuilder = new StringBuilder();
 
@@ -57,7 +57,7 @@ public class CaService {
                 .uri("http://52.45.29.135:3000/api/revoke")
                 .body(BodyInserters.fromFormData(params))
                 .exchange();
-        return responseMono.flatMap(res -> res.bodyToMono(String.class)).block();
+        return responseMono.flatMap(res -> res.bodyToMono(ResponseDto.class)).block();
     }
 
     public ResponseDto issueCertificate(String cert) throws InvalidKeySpecException, CertificateException,
