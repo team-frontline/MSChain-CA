@@ -40,6 +40,6 @@ public class Config {
 
     public static final String CA_CERT_FILE_NAME = "certCA1.pem";
 
-    public static boolean DEMO_MODE =  true;
+    public static boolean DEMO_MODE =  false;
 
 }

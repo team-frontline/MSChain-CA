@@ -103,8 +103,8 @@ public class Util {
                 CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
                 ByteArrayInputStream in = new ByteArrayInputStream(pemObject.getContent());
                 caCertificate = (X509Certificate) certificateFactory.generateCertificate(in);
-            } else {
 
+            } else {
                 KeyPair keyPair = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
                         + Config.PRIVATE_KEY_FILE_NAME);
 
