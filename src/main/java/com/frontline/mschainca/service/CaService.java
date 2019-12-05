@@ -1,6 +1,7 @@
 package com.frontline.mschainca.service;
 
 
+import com.frontline.mschainca.dto.ResponseDto;
 import com.frontline.mschainca.util.Util;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -11,11 +12,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -42,51 +41,32 @@ public class CaService {
         return Util.signString(certificate);
     }
 
-    public String  revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
+    public String revokeCertificate(String cert) throws InvalidKeySpecException, CertificateException,
             OperatorCreationException, NoSuchAlgorithmException, IOException, SignatureException, InvalidKeyException {
         StringBuilder responseStringBuilder = new StringBuilder();
 
-        String caCert =  Util.stringFromCert(Util.generateSelfSingedCert());
+        String caCert = Util.stringFromCert(Util.generateSelfSingedCert());
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cert", cert);
         params.add("caCert", caCert);
-//        params.add("caSig", new String(Util.signString(cert), StandardCharsets.ISO_8859_1));
         params.add("caSig", new String(Hex.encode(Util.signString(cert))));
-
-//        Flux<String> stringFlux = WebClient.create()
-//                .post()
-//                .uri("http://18.232.207.225:3000/api/revoke")
-//                .body(BodyInserters.fromFormData(params))
-//                .retrieve()
-//                .bodyToFlux(String.class);
 
         Mono<ClientResponse> responseMono = WebClient.create()
                 .post()
                 .uri("http://52.45.29.135:3000/api/revoke")
                 .body(BodyInserters.fromFormData(params))
                 .exchange();
-
-//        stringFlux.subscribe(s -> System.out.println(s));
         return responseMono.flatMap(res -> res.bodyToMono(String.class)).block();
     }
 
-    public String issueCertificate(String cert) throws InvalidKeySpecException, CertificateException,
+    public ResponseDto issueCertificate(String cert) throws InvalidKeySpecException, CertificateException,
             OperatorCreationException, NoSuchAlgorithmException, IOException {
-        StringBuilder responseStriongBuilder = new StringBuilder();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cert", cert);
         params.add("intermediateCert", Util.stringFromCert(Util.generateSelfSingedCert()));
         params.add("sig", "");
-
-//        Flux<String> stringFlux = WebClient.create()
-////                .post()
-////                .uri("http://18.232.207.225:3000/api/issue")
-////                .body(BodyInserters.fromFormData(params))
-////                .retrieve()
-////                .bodyToFlux(String.class);
-
 
         Mono<ClientResponse> responseMono = WebClient.create()
                 .post()
@@ -94,16 +74,11 @@ public class CaService {
                 .body(BodyInserters.fromFormData(params))
                 .exchange();
 
-        return responseMono.flatMap(res -> res.bodyToMono(String.class)).block();
-//
-//        stringFlux.subscribe(s -> System.out.println(s));
-//        System.out.println("response"+ responseStriongBuilder.toString());
-//        return responseStriongBuilder.toString();
+        return responseMono.flatMap(res -> res.bodyToMono(ResponseDto.class)).block();
     }
 
     public String getSignedProposedCertificate(String proposedCert, String msUrl) {
         return null;
-
     }
 
 

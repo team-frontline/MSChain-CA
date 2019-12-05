@@ -2,6 +2,7 @@ package com.frontline.mschainca.controller;
 
 import com.frontline.mschainca.dto.CertificateDto;
 import com.frontline.mschainca.dto.CsrDto;
+import com.frontline.mschainca.dto.ResponseDto;
 import com.frontline.mschainca.service.CaService;
 import com.frontline.mschainca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,16 +36,20 @@ public class CaController {
 
     @ResponseBody
     @RequestMapping(value = "/certificate/new")
-    public String requestNewCertificate(@RequestBody CsrDto csrDto) {
-        String response = null;
+    public ResponseEntity<ResponseDto> requestNewCertificate(@RequestBody CsrDto csrDto) {
+        ResponseDto responseDto = null;
         try {
             String proposedCert = Util.signCSR(Util.getCSRfromString(csrDto.getCsr()));
-            response = caService.issueCertificate(proposedCert);
-            response = response.concat(", proposed Cert: " + proposedCert);
+            responseDto = caService.issueCertificate(proposedCert);
+
+            if (responseDto != null && responseDto.getResult().getStatus().equals("OK")) {
+                responseDto.setCertificate(proposedCert);
+            }
+//            response = response.concat(", proposed Cert: " + proposedCert);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return response;
+        return new ResponseEntity<ResponseDto>(responseDto, HttpStatus.OK);
     }
 
     @ResponseBody
