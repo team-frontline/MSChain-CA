@@ -28,6 +28,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -266,5 +268,11 @@ public class Util {
             keyPair = new KeyPair(publicKey, privateKey);
         }
         return keyPair;
+    }
+
+    public static MultiValueMap<String, String> getResponseHeaders() {
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("name", CaDetailsConfig.COMMON_NAME);
+        return headers;
     }
 }

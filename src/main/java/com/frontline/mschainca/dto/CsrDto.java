@@ -12,4 +12,9 @@ public class CsrDto implements Serializable {
     public void setCsr(String csr) {
         this.csr = csr;
     }
+
+    @Override
+    public String toString() {
+        return "CSR : "+ csr;
+    }
 }
