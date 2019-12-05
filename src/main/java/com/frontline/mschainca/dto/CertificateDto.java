@@ -13,4 +13,9 @@ public class CertificateDto implements Serializable {
     public void setCertificate(String certificate) {
         this.certificate = certificate;
     }
+
+    @Override
+    public String toString() {
+        return "certificate :" + certificate;
+    }
 }

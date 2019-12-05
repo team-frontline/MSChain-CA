@@ -33,4 +33,13 @@ public class ResponseDto implements Serializable {
     public void setCertificate(String certificate) {
         this.certificate = certificate;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("operation : " + operation)
+                .append("result : " + result.toString())
+                .append("certificate : " + certificate);
+        return stringBuilder.toString();
+    }
 }

@@ -1,13 +1,13 @@
 package com.frontline.mschainca.controller;
 
 import com.frontline.mschainca.config.CaDetailsConfig;
+import com.frontline.mschainca.config.Config;
 import com.frontline.mschainca.dto.CertificateDto;
 import com.frontline.mschainca.dto.CsrDto;
 import com.frontline.mschainca.dto.ResponseDto;
 import com.frontline.mschainca.service.CaService;
 import com.frontline.mschainca.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -43,9 +43,9 @@ public class CaController {
     public ResponseEntity<ResponseDto> requestNewCertificate(@RequestBody CsrDto csrDto) {
         ResponseDto responseDto = null;
         try {
-            String proposedCert = Util.signCSR(Util.getCSRfromString(csrDto.getCsr()));
+            String proposedCert = null;
+            proposedCert = Config.DEMO_MODE ? Config.TEST_CERT : Util.signCSR(Util.getCSRfromString(csrDto.getCsr()));
             responseDto = caService.issueCertificate(proposedCert);
-
             if (responseDto != null && responseDto.getResult().getStatus().equals("OK")) {
                 responseDto.setCertificate(proposedCert);
             }
@@ -56,13 +56,14 @@ public class CaController {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("name", CaDetailsConfig.COMMON_NAME);
 
-        return new ResponseEntity<ResponseDto>(responseDto,  headers, HttpStatus.OK);
+        return new ResponseEntity<ResponseDto>(responseDto, headers, HttpStatus.OK);
     }
 
     @ResponseBody
     @RequestMapping(value = "/certificate/revoke")
     public ResponseEntity<ResponseDto> revokeCertificate(@RequestBody CertificateDto certificateToRevoke) {
         ResponseDto responseDto = null;
+
         try {
             responseDto = caService.revokeCertificate(certificateToRevoke.getCertificate());
 
@@ -77,6 +78,6 @@ public class CaController {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("name", CaDetailsConfig.COMMON_NAME);
 
-        return new ResponseEntity<ResponseDto>(responseDto,  headers, HttpStatus.OK);
+        return new ResponseEntity<ResponseDto>(responseDto, headers, HttpStatus.OK);
     }
 }

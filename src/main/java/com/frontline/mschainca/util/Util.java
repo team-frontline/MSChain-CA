@@ -74,8 +74,6 @@ public class Util {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
         ByteArrayInputStream in = new ByteArrayInputStream(pemObject.getContent());
         X509Certificate result = (X509Certificate) certificateFactory.generateCertificate(in);
-
-        System.out.println("hi");
     }
 
     public static PKCS10CertificationRequest getCSRfromString(String csrString) {
@@ -96,35 +94,45 @@ public class Util {
     public static X509Certificate generateSelfSingedCert() throws NoSuchAlgorithmException, IOException,
             InvalidKeySpecException, OperatorCreationException, CertificateException {
         if (caCertificate == null) {
-            KeyPair keyPair = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
-                    + Config.PRIVATE_KEY_FILE_NAME);
+            File caCertFile = new File(Config.KEY_STORE_PATH + File.separator + Config.CA_CERT_FILE_NAME);
+            if (caCertFile.exists()) {
+                PemReader pemReader = new PemReader(new FileReader(caCertFile));
+                PemObject pemObject = pemReader.readPemObject();
+                CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+                ByteArrayInputStream in = new ByteArrayInputStream(pemObject.getContent());
+                caCertificate = (X509Certificate) certificateFactory.generateCertificate(in);
+            } else {
 
-            final Instant now = Instant.now();
-            final Date notBefore = Date.from(now);
-            final Date notAfter = Date.from(now.plus(Duration.ofDays(365 * 2)));
-            ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256WITHRSAENCRYPTION")
-                    .build(keyPair.getPrivate());
-            X500Name name = new X500Name(BCStyle.INSTANCE, "CN=" + CaDetailsConfig.CA_NAME + ", O="
-                    + CaDetailsConfig.ORGANIZATION);
-            final X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(
-                    name,
-                    BigInteger.valueOf(now.toEpochMilli()),
-                    notBefore,
-                    notAfter,
-                    name,
-                    keyPair.getPublic())
-                    .addExtension(Extension.subjectKeyIdentifier, false, createSubjectKeyId(keyPair.getPublic()))
-                    .addExtension(Extension.authorityKeyIdentifier, false, createAuthorityKeyId(keyPair.getPublic()))
-                    .addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+                KeyPair keyPair = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
+                        + Config.PRIVATE_KEY_FILE_NAME);
 
-            X509CertificateHolder certificateHolder = certificateBuilder.build(contentSigner);
+                final Instant now = Instant.now();
+                final Date notBefore = Date.from(now);
+                final Date notAfter = Date.from(now.plus(Duration.ofDays(365 * 2)));
+                ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256WITHRSAENCRYPTION")
+                        .build(keyPair.getPrivate());
+                X500Name name = new X500Name(BCStyle.INSTANCE, "CN=" + CaDetailsConfig.CA_NAME + ", O="
+                        + CaDetailsConfig.ORGANIZATION);
+                final X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(
+                        name,
+                        BigInteger.valueOf(now.toEpochMilli()),
+                        notBefore,
+                        notAfter,
+                        name,
+                        keyPair.getPublic())
+                        .addExtension(Extension.subjectKeyIdentifier, false, createSubjectKeyId(keyPair.getPublic()))
+                        .addExtension(Extension.authorityKeyIdentifier, false, createAuthorityKeyId(keyPair.getPublic()))
+                        .addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
 
-            PemWriter pemWriter = new PemWriter(new FileWriter(Config.KEY_STORE_PATH + File.separator
-                    + "certCA1.pem"));
-            pemWriter.writeObject(new PemObject("CERTIFICATE", certificateHolder.toASN1Structure().getEncoded()));
-            pemWriter.close();
-            caCertificate = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
-                    .getCertificate(certificateHolder);
+                X509CertificateHolder certificateHolder = certificateBuilder.build(contentSigner);
+
+                PemWriter pemWriter = new PemWriter(new FileWriter(Config.KEY_STORE_PATH + File.separator
+                        + "certCA1.pem"));
+                pemWriter.writeObject(new PemObject("CERTIFICATE", certificateHolder.toASN1Structure().getEncoded()));
+                pemWriter.close();
+                caCertificate = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
+                        .getCertificate(certificateHolder);
+            }
         }
         return caCertificate;
     }
@@ -182,7 +190,7 @@ public class Util {
     public static byte[] signString(String message) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException,
             InvalidKeyException, SignatureException {
         Security.addProvider(new BouncyCastleProvider());
-        KeyPair keyPair =  getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
+        KeyPair keyPair = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
                 + Config.PRIVATE_KEY_FILE_NAME);
         PrivateKey privateKey = keyPair.getPrivate();
         Signature signature = Signature.getInstance("SHA256withRSA");

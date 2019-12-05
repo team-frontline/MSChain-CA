@@ -95,6 +95,24 @@ class UtilTest {
             "ioKi9iBQiJjVE0OTmj0K4M+AIgeZAW8Oxn/krw7k16qaHr/9QNbdRbkC+psmmg==\n" +
             "-----END CERTIFICATE REQUEST-----\n";
 
+    final String csrSupimi = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+            "MIICrzCCAZcCAQAwajELMAkGA1UEBhMCU0wxDTALBgNVBAgTBFdlc3QxEDAOBgNV\n" +
+            "BAcTB0NvbG9tYm8xFjAUBgNVBAoTDUZyb250bGluZS5vcmcxEDAOBgNVBAsTB01T\n" +
+            "Q2hhaW4xEDAOBgNVBAMTB21zMS5vcmcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw\n" +
+            "ggEKAoIBAQC12cVV2UtbiycHvXfKD5Dar9Todh6zCqNt2e2iF0cli8Q4QSWa+xDv\n" +
+            "f189fOw5WvE/f+VVhcoEqoX/dkkB4MCwpsuLpdCmtLQdWe5fmXeVi0UnvJBH92hE\n" +
+            "1wMalG6hWQRTYTJBLeBb+13mV/tSWHU81C7eAqj8IwB5jEvNuZj5vgUrGLuC87Fz\n" +
+            "tYmCHZeJ7nyYeu0BzfBTrk/Gwwp3lgMmVOoz3pan26ZIXpNvAQxeWOoj4NcBqvi9\n" +
+            "G4jjA1xHgrqlHcNxXtNUyYaKJ+gtrKTlx7Ukre6Q7cyr5AT3QOCEmhGbK+hfYK91\n" +
+            "PhGugrqoS01HnsytfXOewrsbfEL1kCfnAgMBAAGgADANBgkqhkiG9w0BAQsFAAOC\n" +
+            "AQEAlKIwKl8aZUM7Z8LlHF/Vb0mBYSDwyu3JSUh3TJh2wdkL1m2S61e9GU6an2gb\n" +
+            "UslS+Tk+MjumPHoY8h7K2eQNOOKiavrkNru2sVWtQbXUde2bqUh/DA6r+oN1GmnV\n" +
+            "ihah8df8qndmffp+z91+aiUyoKAsPAb96gDfEDDm7Go+/kto3rQqp1MATRR2aaeX\n" +
+            "9Ro9f7lL2B0ejQJVY5tVxdpaJDWXrnB1Aybh7rmUERmxfI7dQvQSPCFCYc5h2afx\n" +
+            "QkeiHPvHCtHloFJCnAyMzES1yqEsGPZAuiCqOn6QVfamnkjGhqL26tAmvUg2Xv0l\n" +
+            "3lxIWB0+2AkKt8r52MiWKNZ+CA==\n" +
+            "-----END NEW CERTIFICATE REQUEST-----\n";
+
 
     @Test
     void decodeCSR() {
@@ -146,7 +164,7 @@ class UtilTest {
 
     @Test
     void signCSR() {
-        PKCS10CertificationRequest certificationRequest = Util.getCSRfromString(csrAshoka);
+        PKCS10CertificationRequest certificationRequest = Util.getCSRfromString(csrSupimi);
         String certString = null;
         try {
             certString = Util.signCSR(certificationRequest);
