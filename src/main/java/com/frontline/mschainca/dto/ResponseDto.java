@@ -37,9 +37,9 @@ public class ResponseDto implements Serializable {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("operation : " + operation)
-                .append("result : " + result.toString())
-                .append("certificate : " + certificate);
+        stringBuilder.append("operation: " + operation)
+                .append(", result: [" + result.toString()+ "]")
+                .append(", certificate: " + certificate);
         return stringBuilder.toString();
     }
 }

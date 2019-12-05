@@ -56,7 +56,7 @@ public class CaController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOGGER.log(Level.INFO, "RESPONSE :\n" + (responseDto != null ? responseDto.toString() : null));
+        LOGGER.log(Level.INFO, "RESPONSE: [" + (responseDto != null ? responseDto.toString() : null) + "]");
         return new ResponseEntity<ResponseDto>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
     }
 
@@ -74,7 +74,7 @@ public class CaController {
                 ex.printStackTrace();
             }
         }
-        LOGGER.log(Level.INFO, "RESPONSE :\n" + (responseDto != null ? responseDto.toString() : null));
+        LOGGER.log(Level.INFO, "RESPONSE: [" + (responseDto != null ? responseDto.toString() : null) + "]");
         return new ResponseEntity<ResponseDto>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
     }
 }

@@ -16,6 +16,6 @@ public class ResultDto implements Serializable {
 
     @Override
     public String toString() {
-        return "status :" + status;
+        return "status: " + status;
     }
 }
