@@ -1,6 +1,7 @@
 package com.frontline.mschainca.service;
 
 
+import com.frontline.mschainca.config.CaDetailsConfig;
 import com.frontline.mschainca.dto.CertificateDto;
 import com.frontline.mschainca.dto.ResponseDto;
 import com.frontline.mschainca.util.Util;
@@ -80,19 +81,19 @@ public class CaService {
 
     public ResponseDto updateCertificate(String cert, String signature) throws InvalidKeySpecException, CertificateException,
             OperatorCreationException, NoSuchAlgorithmException, IOException {
+        if (Util.checkCertificateIssuer(cert, CaDetailsConfig.COMMON_NAME)) {
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("cert", cert);
+            params.add("intermediateCert", Util.stringFromCert(Util.generateSelfSingedCert()));
+            params.add("sig", signature);
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("cert", cert);
-        params.add("intermediateCert", Util.stringFromCert(Util.generateSelfSingedCert()));
-        params.add("sig", signature);
-
-        Mono<ClientResponse> responseMono = WebClient.create()
-                .post()
-                .uri("http://52.45.29.135:3000/api/issue")
-                .body(BodyInserters.fromFormData(params))
-                .exchange();
-
-        return responseMono.flatMap(res -> res.bodyToMono(ResponseDto.class)).block();
+            Mono<ClientResponse> responseMono = WebClient.create()
+                    .post()
+                    .uri("http://52.45.29.135:3000/api/issue")
+                    .body(BodyInserters.fromFormData(params))
+                    .exchange();
+            return responseMono.flatMap(res -> res.bodyToMono(ResponseDto.class)).block();
+        } else return new ResponseDto("The proposed certificate is not issued from the CA: " + CaDetailsConfig.CA_NAME);
     }
 
     public CertificateDto getProposedCertificate(String csr) throws InvalidKeySpecException, OperatorCreationException,

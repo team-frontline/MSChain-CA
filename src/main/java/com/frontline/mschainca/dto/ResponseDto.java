@@ -10,6 +10,14 @@ public class ResponseDto implements Serializable {
 
     private String certificate;
 
+    private String message;
+
+    public ResponseDto(){}
+
+    public ResponseDto(String message){
+        this.message = message;
+    }
+
     public String getOperation() {
         return operation;
     }
@@ -34,12 +42,21 @@ public class ResponseDto implements Serializable {
         this.certificate = certificate;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("operation: " + operation)
-                .append(", result: [" + result.toString()+ "]")
-                .append(", certificate: " + certificate);
+                .append(", result: [" + result.toString() + "]")
+                .append(", certificate: " + certificate)
+                .append(", message: " + message);
         return stringBuilder.toString();
     }
 }

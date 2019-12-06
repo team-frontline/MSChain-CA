@@ -69,13 +69,13 @@ public class Util {
         }
     }
 
-    public static void decodePEM(String cert) throws IOException, CertificateException {
+    public static X509Certificate decodePEM(String cert) throws IOException, CertificateException {
         PemObject pemObject;
         final PemReader pemReader = new PemReader(new StringReader(cert));
         pemObject = pemReader.readPemObject();
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
         ByteArrayInputStream in = new ByteArrayInputStream(pemObject.getContent());
-        X509Certificate result = (X509Certificate) certificateFactory.generateCertificate(in);
+        return (X509Certificate) certificateFactory.generateCertificate(in);
     }
 
     public static PKCS10CertificationRequest getCSRfromString(String csrString) {
@@ -103,6 +103,7 @@ public class Util {
                 CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
                 ByteArrayInputStream in = new ByteArrayInputStream(pemObject.getContent());
                 caCertificate = (X509Certificate) certificateFactory.generateCertificate(in);
+                pemReader.close();
 
             } else {
                 KeyPair keyPair = getKeyPairFromKeyFile(Config.KEY_STORE_PATH + File.separator
@@ -268,6 +269,12 @@ public class Util {
             keyPair = new KeyPair(publicKey, privateKey);
         }
         return keyPair;
+    }
+
+    public static boolean checkCertificateIssuer(String certificate, String issuerName) throws IOException,
+            CertificateException {
+        X509Certificate x509Certificate = decodePEM(certificate);
+        return x509Certificate.getIssuerDN().getName().contains("CN="+issuerName);
     }
 
     public static MultiValueMap<String, String> getResponseHeaders() {

@@ -243,12 +243,14 @@ class UtilTest {
 
     @Test
     void decodePEM() {
+        X509Certificate x509Certificate = null;
         try {
-            Util.decodePEM(certificate);
+            x509Certificate = Util.decodePEM(certificate);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (CertificateException e) {
             e.printStackTrace();
         }
+        Assert.assertNotNull(x509Certificate);
     }
 }
