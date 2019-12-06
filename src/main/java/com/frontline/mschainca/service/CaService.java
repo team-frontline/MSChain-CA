@@ -1,6 +1,7 @@
 package com.frontline.mschainca.service;
 
 
+import com.frontline.mschainca.dto.CertificateDto;
 import com.frontline.mschainca.dto.ResponseDto;
 import com.frontline.mschainca.util.Util;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -75,6 +76,30 @@ public class CaService {
                 .exchange();
 
         return responseMono.flatMap(res -> res.bodyToMono(ResponseDto.class)).block();
+    }
+
+    public ResponseDto updateCertificate(String cert, String signature) throws InvalidKeySpecException, CertificateException,
+            OperatorCreationException, NoSuchAlgorithmException, IOException {
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("cert", cert);
+        params.add("intermediateCert", Util.stringFromCert(Util.generateSelfSingedCert()));
+        params.add("sig", signature);
+
+        Mono<ClientResponse> responseMono = WebClient.create()
+                .post()
+                .uri("http://52.45.29.135:3000/api/issue")
+                .body(BodyInserters.fromFormData(params))
+                .exchange();
+
+        return responseMono.flatMap(res -> res.bodyToMono(ResponseDto.class)).block();
+    }
+
+    public CertificateDto getProposedCertificate(String csr) throws InvalidKeySpecException, OperatorCreationException,
+            NoSuchAlgorithmException, IOException {
+        CertificateDto certificateDto = new CertificateDto();
+        certificateDto.setCertificate(Util.signCSR(Util.getCSRfromString(csr)));
+        return certificateDto;
     }
 
     public String getSignedProposedCertificate(String proposedCert, String msUrl) {

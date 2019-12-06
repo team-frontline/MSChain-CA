@@ -2,6 +2,7 @@ package com.frontline.mschainca.controller;
 
 import com.frontline.mschainca.config.Config;
 import com.frontline.mschainca.dto.CertificateDto;
+import com.frontline.mschainca.dto.CertificateUpdateDto;
 import com.frontline.mschainca.dto.CsrDto;
 import com.frontline.mschainca.dto.ResponseDto;
 import com.frontline.mschainca.service.CaService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.logging.Level;
@@ -40,9 +42,9 @@ public class CaController {
     private static Logger LOGGER = Logger.getLogger(CaController.class.getName());
 
     @ResponseBody
-    @RequestMapping(value = "/certificate/new")
+    @RequestMapping(value = "/certificate/new", method = RequestMethod.POST)
     public ResponseEntity<ResponseDto> requestNewCertificate(@RequestBody CsrDto csrDto) {
-        LOGGER.log(Level.INFO, "REQUEST :\n" + csrDto.toString());
+        LOGGER.log(Level.INFO, "REQUEST [New Certificate]:\n" + csrDto.toString());
         ResponseDto responseDto = null;
         try {
             String proposedCert = null;
@@ -56,12 +58,45 @@ public class CaController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOGGER.log(Level.INFO, "RESPONSE: [" + (responseDto != null ? responseDto.toString() : null) + "]");
-        return new ResponseEntity<ResponseDto>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
+        LOGGER.log(Level.INFO, "RESPONSE [New Certificate]: ["
+                + (responseDto != null ? responseDto.toString() : null) + "]");
+        return new ResponseEntity<>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/certificate/get-proposed", method = RequestMethod.POST)
+    public ResponseEntity<CertificateDto> requestProposedCert(@RequestBody CsrDto csrDto) {
+        LOGGER.log(Level.INFO, "REQUEST [Proposed Certificate]:\n" + csrDto.toString());
+        CertificateDto certificateDto = null;
+        try {
+            certificateDto = caService.getProposedCertificate(csrDto.getCsr());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        LOGGER.log(Level.INFO, "RESPONSE [Proposed Certificate]: ["
+                + (certificateDto != null ? certificateDto.toString() : null) + "]");
+        return new ResponseEntity<>(certificateDto, Util.getResponseHeaders(), HttpStatus.OK);
     }
 
     @ResponseBody
-    @RequestMapping(value = "/certificate/revoke")
+    @RequestMapping(value = "/certificate/update", method = RequestMethod.POST)
+    public ResponseEntity<ResponseDto> updateCertificate(@RequestBody CertificateUpdateDto certificateUpdateDto) {
+        LOGGER.log(Level.INFO, "REQUEST [Update Certificate]:\n" + certificateUpdateDto.toString());
+        ResponseDto responseDto = null;
+        try {
+            responseDto = caService.updateCertificate(certificateUpdateDto.getCertificate(),
+                    certificateUpdateDto.getSignature());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        LOGGER.log(Level.INFO, "RESPONSE [Update Certificate]: ["
+                + (responseDto != null ? responseDto.toString() : null) + "]");
+        return new ResponseEntity<>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/certificate/revoke", method = RequestMethod.POST)
     public ResponseEntity<ResponseDto> revokeCertificate(@RequestBody CertificateDto certificateToRevoke) {
         LOGGER.log(Level.INFO, "REQUEST :\n" + certificateToRevoke.toString());
         ResponseDto responseDto = null;
@@ -75,6 +110,6 @@ public class CaController {
             }
         }
         LOGGER.log(Level.INFO, "RESPONSE: [" + (responseDto != null ? responseDto.toString() : null) + "]");
-        return new ResponseEntity<ResponseDto>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
     }
 }
