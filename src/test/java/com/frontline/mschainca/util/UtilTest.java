@@ -183,10 +183,29 @@ class UtilTest {
     @Test
     void signString() throws InvalidKeySpecException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, IOException {
         String message = "hello is it me you looking for";
+        String propCert = "-----BEGIN CERTIFICATE-----\n" +
+                "MIIDDDCCAfQCBgFu4fUERzANBgkqhkiG9w0BAQsFADAmMRYwFAYDVQQDDA1hZG1p\n" +
+                "bi5jYTEuY29tMQwwCgYDVQQKDANDQTEwHhcNMTkxMjA2MjAwMjQxWhcNMjExMjA2\n" +
+                "MjAwMjQxWjBtMQswCQYDVQQGEwJTTDENMAsGA1UECBMEV2VzdDEQMA4GA1UEBxMH\n" +
+                "Q29sb21ibzEWMBQGA1UEChMNRnJvbnRsaW5lLm9yZzEQMA4GA1UECxMHTVNDaGFp\n" +
+                "bjETMBEGA1UEAxMKY2hhbWVlLm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC\n" +
+                "AQoCggEBANC2qCSMmS9zkTouz5rAfpSm/YQjTGigdzh7wTTDQSXOiufzZyb14e0E\n" +
+                "ZkaikMEoKpiAXK5oS14MxneYqIeTjT6YijItGr5kCgq9hgFO7aKfo351ABoIS0J5\n" +
+                "cbMcYQd7SmhNu3PHNyfV0t2fDvCjbEbu94+viA6y9B0RMXbDow68IZ3UUloUUlAL\n" +
+                "gKTRAKBWJtkDmy72vKqRodQv3k+19z9+6sc8BfL+BRcqYfSMz5TB+cn6lJ1VwDSA\n" +
+                "i/2e0jflN72hz3wzvdC+9/Up0YiI07P4UN0ndxBBzOZSBPs592bsAu44JKMTMLkA\n" +
+                "7N+1HzUi+O+V7Q6aATPTBQzMdMcsZocCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEA\n" +
+                "XI3RD4N9SjSJUcFOftD2+UAiB+Z2DU6BudUWWuW6dMl+khkCKn//4ifLztg3jFIZ\n" +
+                "OyQRof7lAMOx3zy6Go6u/hj8gQ/7igsDOcsF6beik8TXiIMRxQt2wpjVqIvENMS8\n" +
+                "LhhKPG3X2yEItdfjitm/6PRUmUo2IjeIW5EFQu5COYSBPq5pVTJNsph3bjdPrWpG\n" +
+                "wRJaIFcau827yyhB8PTWbw3qDphMBldrKbDi5OV9utQEHc+Ea6FyOV2ab6hlkGQ4\n" +
+                "767FvOWfDNdZkE593AcR7jWOcb0VfLzpaRHdewFQUEi4f7tGZeTnKMeMXx+khTkI\n" +
+                "uvPQ8B4Tw7Uf2T2n/lsHWg==\n" +
+                "-----END CERTIFICATE-----";
         byte[] signedMsg = null;
         boolean verified = false;
         try {
-            signedMsg = Util.signString(message);
+            signedMsg = Util.signString(propCert);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -199,7 +218,7 @@ class UtilTest {
             e.printStackTrace();
         }
         if (signedMsg != null) {
-            verified = Util.verifySignedString(message, signedMsg);
+            verified = Util.verifySignedString(propCert, signedMsg);
         }
         Assert.assertTrue(verified);
     }

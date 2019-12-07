@@ -96,6 +96,23 @@ public class CaService {
         } else return new ResponseDto("The proposed certificate is not issued from the CA: " + CaDetailsConfig.CA_NAME);
     }
 
+//    public String updateCertificate(String cert, String signature) throws InvalidKeySpecException, CertificateException,
+//            OperatorCreationException, NoSuchAlgorithmException, IOException {
+//        if (Util.checkCertificateIssuer(cert, CaDetailsConfig.COMMON_NAME)) {
+//            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+//            params.add("cert", cert);
+//            params.add("intermediateCert", Util.stringFromCert(Util.generateSelfSingedCert()));
+//            params.add("sig", signature);
+//
+//            Mono<ClientResponse> responseMono = WebClient.create()
+//                    .post()
+//                    .uri("http://52.45.29.135:3000/api/issue")
+//                    .body(BodyInserters.fromFormData(params))
+//                    .exchange();
+//            return responseMono.flatMap(res -> res.bodyToMono(String.class)).block();
+//        } else return "The proposed certificate is not issued from the CA: " + CaDetailsConfig.CA_NAME;
+//    }
+
     public CertificateDto getProposedCertificate(String csr) throws InvalidKeySpecException, OperatorCreationException,
             NoSuchAlgorithmException, IOException {
         CertificateDto certificateDto = new CertificateDto();

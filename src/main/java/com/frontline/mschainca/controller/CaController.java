@@ -95,6 +95,22 @@ public class CaController {
         return new ResponseEntity<>(responseDto, Util.getResponseHeaders(), HttpStatus.OK);
     }
 
+//    @ResponseBody
+//    @RequestMapping(value = "/certificate/update", method = RequestMethod.POST)
+//    public String updateCertificate(@RequestBody CertificateUpdateDto certificateUpdateDto) {
+//        LOGGER.log(Level.INFO, "REQUEST [Update Certificate]:\n" + certificateUpdateDto.toString());
+//        String response = null;
+//        try {
+//            response = caService.updateCertificate(certificateUpdateDto.getCertificate(),
+//                    certificateUpdateDto.getSignature());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        LOGGER.log(Level.INFO, "RESPONSE [Update Certificate]: ["
+//                + (response) + "]");
+//        return response;
+//    }
+
     @ResponseBody
     @RequestMapping(value = "/certificate/revoke", method = RequestMethod.POST)
     public ResponseEntity<ResponseDto> revokeCertificate(@RequestBody CertificateDto certificateToRevoke) {
